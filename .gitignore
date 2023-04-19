@@ -1,1 +1,9 @@
 *.png
+*.pdf
+*.gif
+*.jpg
+*.spec
+
+build
+dist
+__pycache__
