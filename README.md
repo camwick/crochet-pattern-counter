@@ -11,10 +11,10 @@ The program will first search for any images found in the `images/` (or the spec
 
 ## Creating EXE
 
-To create an executable, insure that pyinstaller is istalled with `pip intall pyinstalller`. 
+To create an executable, insure that pyinstaller is istalled with `pip intall pyinstaller`. 
 Here is the command used to create the executible: 
 ```
 pyinstaller --onefile --windowed --name "Crochet Color Counter" --add-data="./counterUI.ui;." counterUI.py PatternCounter.py
 ```
 
-You'll only need to add the `images/` directory (or the specifed dir) to the same directory the executable lives.
+On first run, the executable will create the directories specifed in `counterUI.py`.
