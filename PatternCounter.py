@@ -1,124 +1,20 @@
 from PIL import Image, ImageFont, ImageDraw
 
 class PixelCounter:
-    def __init__(self, imgPath, width, length) -> None:
+    def __init__(self, imgPath, width, length, threshold) -> None:
         self.img = Image.open(imgPath)
         self.img = self.img.convert("RGB")
         self.borderColor = self.img.getpixel((0, 0))
-        self.width = width
-        self.length = length
         self.trueWidth, self.trueLength = self.img.size
         self.counts = []
+        self.drawThreshold = threshold
+
+        # These variables help with choosing a font size
+        self.width = width
+        self.length = length
         self.approximateSqrSize = ((self.trueWidth - 1) // self.width , (self.trueLength - 1) // self.length)
-
+        
         self.sampleColors()
-
-    def count(self):
-        img_editable = ImageDraw.Draw(self.img)
-        
-        for y in range(1 , self.trueLength, self.approximateSqrSize[1]):
-            rowCounts = []
-
-            count = 0
-            prevColor = self.img.getpixel((1, y))
-
-            xCoord = 1
-
-            for x in range(1, self.trueWidth, self.approximateSqrSize[0]):
-                currentColor = self.img.getpixel((x, y))
-
-                if currentColor == self.borderColor:
-                    temp1Color = self.img.getpixel((x, y-1))
-                    temp2Color = self.img.getpixel((x, y+1))
-
-                    temp3Color = self.img.getpixel((x-1, y))
-                    temp4Color = self.img.getpixel((x+1, y))
-
-
-                    if temp1Color != self.borderColor and temp2Color != self.borderColor:
-                        currentColor = temp2Color
-                        y += 1
-                    if temp3Color != self.borderColor and temp4Color != self.borderColor:
-                        currentColor = temp4Color
-                        x += 1
-                    
-                
-                if prevColor == currentColor:
-                    count += 1
-                else:
-                    rowCounts.append((prevColor, count))
-                    
-                    if count > 4:
-                        typeX = xCoord
-                        typeY = y
-
-                        # adjust x and y values for typing
-                        countStr = str(count)
-                        if prevColor == (0, 0, 0):
-                            fontColor = (255, 255, 255)
-
-                            while self.img.getpixel((typeX, typeY)) == self.borderColor:
-                                typeX -= 1
-                            typeX += 2
-                            # while self.img.getpixel((typeX, typeY)) == self.borderColor:
-                            #     typeY -= 1
-                            # typeY += 1
-                        else:
-                            fontColor = (0, 0, 0)
-
-                            while self.img.getpixel((typeX, typeY)) != self.borderColor:
-                                typeX -= 1
-                            typeX += 1
-                            while self.img.getpixel((typeX, typeY)) != self.borderColor:
-                                typeY -= 1
-                            typeY += 1
-                            
-                        numShift = 0
-                        for num in countStr:
-                            self.writeNum(img_editable, (typeX + (numShift * self.approximateSqrSize[0]), typeY), num, fontColor)
-                            numShift += 1
-                
-                    count = 1
-                    prevColor = currentColor
-                    xCoord = x
-
-
-            if count > 4:
-                typeX = xCoord
-                typeY = y
-
-                #write the count on the picture
-                count = str(count)
-                if prevColor == (0, 0, 0):
-                    fontColor = (255, 255, 255)
-
-                    while self.img.getpixel((typeX, typeY)) == self.borderColor:
-                        typeX -= 1
-                    typeX += 2
-                    # while self.img.getpixel((typeX, typeY)) == self.borderColor:
-                    #     typeY -= 1
-                    # typeY += 1
-                else:
-                    fontColor = (0, 0, 0)
-
-                    while self.img.getpixel((typeX, typeY)) != self.borderColor:
-                        typeX -= 1
-                    typeX += 1
-                    while self.img.getpixel((typeX, typeY)) != self.borderColor:
-                        typeY -= 1
-                    typeY += 1
-                
-                numShift = 0
-                for num in count:
-                    self.writeNum(img_editable, (typeX + (numShift * self.approximateSqrSize[0]), typeY), num, fontColor)
-                    numShift += 1
-
-            rowCounts.append((prevColor, count))
-
-            self.counts.append(rowCounts)
-
-        
-        self.img.save("result.png")
 
     def sampleColors(self):
         self.rows = set()
@@ -156,10 +52,51 @@ class PixelCounter:
         self.rows = sorted(self.rows)
         self.columns = sorted(self.columns)
 
-    def writeNum(self, img, coord, num, color):
-        font = ImageFont.truetype("calibri", self.approximateSqrSize[0] + 3)
+    def count(self):
+        img_editable = ImageDraw.Draw(self.img)
 
-        img.text(coord, str(num), color, font=font)
+        # step through each row
+        # counting and drawing the adjacent colors in each row
+        for y in range(len(self.columns) - 1):
+            rowCounts = []
+            rgbPrev = self.img.getpixel((self.rows[0] + 1, self.columns[y] + 1))
+            drawX = 0
+            count = 1
+
+            # step through each column
+            for x in range(1, len(self.rows) - 1):
+                rgb = self.img.getpixel((self.rows[x] + 1, self.columns[y] + 1))
+
+                if rgb == rgbPrev:
+                    count += 1
+                else:
+                    if(count > self.drawThreshold):
+                        self.writeNum(img_editable, drawX, y, count, rgbPrev)
+
+                    rowCounts.append((rgbPrev, count))
+                    rgbPrev = rgb
+                    drawX = x
+                    count = 1
+
+            if(count > self.drawThreshold):
+                self.writeNum(img_editable, drawX, y, count, rgbPrev)
+
+            rowCounts.append((rgbPrev, count))
+
+            self.counts.append(rowCounts)
+        self.img.save("result.png")
+
+    def writeNum(self, img, x, y, count, rgb):
+        countStr = str(count)
+        font = ImageFont.truetype("calibri", self.approximateSqrSize[0] + 3)
+        if rgb == (0, 0, 0):
+            color = (255, 255, 255)
+        else:
+            color = (0, 0, 0)
+
+        for num in countStr:
+            img.text((self.rows[x] + 6, self.columns[y] + 1), str(num), color, font=font)
+            x += 1
 
 def main():
     imgPath = "test.png"
@@ -174,13 +111,9 @@ def main():
         width = 72
         length = 70
 
-
-
-    counter = PixelCounter(imgPath, width, length)    
-    # counter.count()
+    counter = PixelCounter(imgPath, width, length, 4)
     counter.sampleColors()
-    print("test")
-
+    counter.count()
 
 if __name__ == "__main__":
     main()
