@@ -101,32 +101,6 @@ class PixelCounter:
             img.text((self.rows[x] + 3, self.columns[y] + 1), str(num), color, font=font)
             x += 1
 
-def main():
-    print("All files found in './pattern_images'")
-    files = os.listdir("./pattern_images")
-    files = [f for f in files if os.path.isfile("./pattern_images"+'/'+f)]
-    count = 1
-    for file in files:
-        print(f"{count}: {file}")
-        count += 1
-
-    userInput = input("\nEnter the file number or the path to a specific file: ")
-    try: 
-        imgPath = "./pattern_images/" + files[int(userInput) - 1]
-    except ValueError:
-        imgPath = userInput
-
-    width = input("Image Width: ")
-    length = input("Image Length: ")
-    threshold = input("Number of squares to count in a row: ")
-
-    counter = PixelCounter(imgPath, int(width), int(length), int(threshold))
-    counter.count()
-
-if __name__ == "__main__":
-    main()
-
-
 # eva: 36, 45
 # fish: 72, 70
 # lady: 55, 83
