@@ -3,7 +3,7 @@ import os
 import re
 
 class PixelCounter:
-    def __init__(self, imgPath, width, length, threshold) -> None:
+    def __init__(self, imgPath, saveFilePath,width, length, threshold) -> None:
         self.img = Image.open(imgPath)
         self.img = self.img.convert("RGB")
         self.borderColor = self.img.getpixel((0, 0))
@@ -11,6 +11,7 @@ class PixelCounter:
         self.counts = []
         self.drawThreshold = threshold
         self.filename = re.search("[^/]+$", imgPath).group().split(".")
+        self.saveFilePath = saveFilePath
 
         # These variables help with choosing a font size
         self.width = width
@@ -87,7 +88,7 @@ class PixelCounter:
             rowCounts.append((rgbPrev, count))
 
             self.counts.append(rowCounts)
-        self.img.save(f"./counted/{self.filename[0]}.{self.filename[1]}")
+        self.img.save(f"{self.saveFilePath}{self.filename[0]}.{self.filename[1]}")
 
     def writeNum(self, img, x, y, count, rgb):
         countStr = str(count)
