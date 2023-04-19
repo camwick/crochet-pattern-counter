@@ -1,4 +1,6 @@
 from PIL import Image, ImageFont, ImageDraw
+import os
+import re
 
 class PixelCounter:
     def __init__(self, imgPath, width, length, threshold) -> None:
@@ -8,6 +10,7 @@ class PixelCounter:
         self.trueWidth, self.trueLength = self.img.size
         self.counts = []
         self.drawThreshold = threshold
+        self.filename = re.search("[^/]+$", imgPath).group().split(".")
 
         # These variables help with choosing a font size
         self.width = width
@@ -70,7 +73,7 @@ class PixelCounter:
                 if rgb == rgbPrev:
                     count += 1
                 else:
-                    if(count > self.drawThreshold):
+                    if(count >= self.drawThreshold):
                         self.writeNum(img_editable, drawX, y, count, rgbPrev)
 
                     rowCounts.append((rgbPrev, count))
@@ -78,13 +81,13 @@ class PixelCounter:
                     drawX = x
                     count = 1
 
-            if(count > self.drawThreshold):
+            if(count >= self.drawThreshold):
                 self.writeNum(img_editable, drawX, y, count, rgbPrev)
 
             rowCounts.append((rgbPrev, count))
 
             self.counts.append(rowCounts)
-        self.img.save("result.png")
+        self.img.save(f"./counted_patterns/{self.filename[0]}.{self.filename[1]}")
 
     def writeNum(self, img, x, y, count, rgb):
         countStr = str(count)
@@ -95,28 +98,35 @@ class PixelCounter:
             color = (0, 0, 0)
 
         for num in countStr:
-            img.text((self.rows[x] + 6, self.columns[y] + 1), str(num), color, font=font)
+            img.text((self.rows[x] + 3, self.columns[y] + 1), str(num), color, font=font)
             x += 1
 
 def main():
-    imgPath = "test.png"
+    print("All files found in './pattern_images'")
+    files = os.listdir("./pattern_images")
+    files = [f for f in files if os.path.isfile("./pattern_images"+'/'+f)]
+    count = 1
+    for file in files:
+        print(f"{count}: {file}")
+        count += 1
 
-    if imgPath == "test.png":
-        width = 36
-        length = 45
-    elif imgPath == "test2.png":
-        width = 55
-        length = 83
-    elif imgPath == "test3.png":
-        width = 72
-        length = 70
+    userInput = input("\nEnter the file number or the path to a specific file: ")
+    try: 
+        imgPath = "./pattern_images/" + files[int(userInput) - 1]
+    except ValueError:
+        imgPath = userInput
 
-    counter = PixelCounter(imgPath, width, length, 4)
-    counter.sampleColors()
+    width = input("Image Width: ")
+    length = input("Image Length: ")
+    threshold = input("Number of squares to count in a row: ")
+
+    counter = PixelCounter(imgPath, int(width), int(length), int(threshold))
     counter.count()
 
 if __name__ == "__main__":
     main()
 
 
-
+# eva: 36, 45
+# fish: 72, 70
+# lady: 55, 83
