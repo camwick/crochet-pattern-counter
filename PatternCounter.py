@@ -87,7 +87,7 @@ class PixelCounter:
             rowCounts.append((rgbPrev, count))
 
             self.counts.append(rowCounts)
-        self.img.save(f"./counted_patterns/{self.filename[0]}.{self.filename[1]}")
+        self.img.save(f"./counted/{self.filename[0]}.{self.filename[1]}")
 
     def writeNum(self, img, x, y, count, rgb):
         countStr = str(count)
