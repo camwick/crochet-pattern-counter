@@ -1,16 +1,18 @@
 import sys, os
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6 import uic
+from pathlib import Path
+from PyQt6 import QtWidgets, uic
 from PatternCounter import PixelCounter
-import time
+
+imagesPath = "./images/"
+countedPath = "./counted/"
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi("counterUI.ui", self)
+        uic.loadUi(self.fetch_resource("counterUI.ui") , self)
         
         # put file names in combo box
-        files = os.listdir("./pattern_images")
+        files = os.listdir(imagesPath)
         for file in files:
             self.fileBox.addItem(file)
 
@@ -31,7 +33,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.pushButton.setEnabled(True)
                 return
         else:
-            imgPath = "./pattern_images/" + self.fileBox.currentText()
+            imgPath = imagesPath + self.fileBox.currentText()
 
         # check if width has data
         width = self.width.text()
@@ -60,6 +62,9 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         
         # count the sqaures and output file
+        if not os.path.exists(countedPath):
+            os.mkdir(countedPath)
+        
         counter.count()
 
         self.pushButton.setEnabled(True)
@@ -76,6 +81,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def indexChanged(self):
         if self.fileBox.currentIndex() == 0 and self.customPath.text() != "":
             self.customPath.setText("")
+
+    def fetch_resource(self, resource_path: Path) -> Path:
+        try:  # running as *.exe; fetch resource from temp directory
+            base_path = Path(sys._MEIPASS)
+        except AttributeError:  # running as script; return unmodified path
+            return resource_path
+        else:  # return temp resource path
+            return base_path.joinpath(resource_path)
 
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()
