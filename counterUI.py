@@ -6,6 +6,12 @@ from PatternCounter import PixelCounter
 imagesPath = "./images/"
 countedPath = "./counted/"
 
+# count the sqaures and output file
+if not os.path.exists(countedPath):
+    os.mkdir(countedPath)
+if not os.path.exists(imagesPath):
+    os.mkdir(imagesPath)
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,15 +61,11 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # try to create a counter object
         try:
-            counter = PixelCounter(imgPath, int(width), int(length), int(threshold))
+            counter = PixelCounter(imgPath, countedPath,int(width), int(length), int(threshold))
         except ValueError:
             self.warning("Invalid Value","Either the 'Width', 'Length', or 'Count Threshold' fields contain data that isn't a number")
             self.pushButton.setEnabled(True)
             return
-        
-        # count the sqaures and output file
-        if not os.path.exists(countedPath):
-            os.mkdir(countedPath)
         
         counter.count()
 
