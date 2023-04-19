@@ -18,3 +18,5 @@ pyinstaller --onefile --windowed --name "Crochet Color Counter" --add-data="./co
 ```
 
 On first run, the executable will create the directories specifed in `counterUI.py`.
+
+~ Note, if on Linux, the `;` in the `--add-data` flag must be changed to a `:`. Refer to the [Pyinstaller Manual](https://pyinstaller.org/en/stable/index.html) for specifics.
