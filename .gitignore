@@ -3,6 +3,7 @@
 *.gif
 *.jpg
 *.spec
+*.cmd
 
 build
 dist
