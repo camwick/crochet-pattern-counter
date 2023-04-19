@@ -9,22 +9,39 @@ class PixelCounter:
         self.length = length
         self.trueWidth, self.trueLength = self.img.size
         self.counts = []
-    
-        self.approximateSqrSize = (self.trueWidth // self.width, self.trueLength // self.length)
+        self.approximateSqrSize = ((self.trueWidth - 1) // self.width , (self.trueLength - 1) // self.length)
+
+        self.sampleColors()
 
     def count(self):
         img_editable = ImageDraw.Draw(self.img)
         
-        for y in range(1 , self.trueLength, self.approximateSqrSize[1] + 1):
+        for y in range(1 , self.trueLength, self.approximateSqrSize[1]):
             rowCounts = []
 
             count = 0
             prevColor = self.img.getpixel((1, y))
 
-            xCoord = 0
+            xCoord = 1
 
-            for x in range(2, self.trueWidth, self.approximateSqrSize[0] + 1):
+            for x in range(1, self.trueWidth, self.approximateSqrSize[0]):
                 currentColor = self.img.getpixel((x, y))
+
+                if currentColor == self.borderColor:
+                    temp1Color = self.img.getpixel((x, y-1))
+                    temp2Color = self.img.getpixel((x, y+1))
+
+                    temp3Color = self.img.getpixel((x-1, y))
+                    temp4Color = self.img.getpixel((x+1, y))
+
+
+                    if temp1Color != self.borderColor and temp2Color != self.borderColor:
+                        currentColor = temp2Color
+                        y += 1
+                    if temp3Color != self.borderColor and temp4Color != self.borderColor:
+                        currentColor = temp4Color
+                        x += 1
+                    
                 
                 if prevColor == currentColor:
                     count += 1
@@ -103,20 +120,70 @@ class PixelCounter:
         
         self.img.save("result.png")
 
+    def sampleColors(self):
+        self.rows = set()
+        self.columns = set()
+
+        self.rows.add(int(0))
+        self.rows.add(self.trueWidth - 1)
+        self.columns.add(int(0))
+        self.columns.add(self.trueLength - 1)
+
+        # get the vertical border lines
+        # step through each row
+        for y in range(self.trueLength - 1):
+            # step through each column on each row, excluding edges
+            for x in range(self.trueWidth - 1):
+                rgb = self.img.getpixel((x, y))
+                rgbPrev = self.img.getpixel((x - 1, y))
+                rgbNext = self.img.getpixel((x + 1, y))
+
+                if rgb == self.borderColor and rgbPrev != self.borderColor and rgbNext != self.borderColor:
+                    self.rows.add(int(x))
+
+        # get the horizontal border lines
+        # step through each column
+        for x in range(self.trueWidth - 1):
+            # step through each row on each column, excluding the edges
+            for y in range(self.trueLength - 1):
+                rgb = self.img.getpixel((x, y))
+                rgbPrev = self.img.getpixel((x, y - 1))
+                rgbNext = self.img.getpixel((x, y + 1))
+
+                if(rgb == self.borderColor and rgbPrev != self.borderColor and rgbNext != self.borderColor):
+                    self.columns.add(int(y))
+
+        self.rows = sorted(self.rows)
+        self.columns = sorted(self.columns)
+
     def writeNum(self, img, coord, num, color):
         font = ImageFont.truetype("calibri", self.approximateSqrSize[0] + 3)
 
         img.text(coord, str(num), color, font=font)
 
 def main():
-    width = 36
-    length = 45
     imgPath = "test.png"
 
+    if imgPath == "test.png":
+        width = 36
+        length = 45
+    elif imgPath == "test2.png":
+        width = 55
+        length = 83
+    elif imgPath == "test3.png":
+        width = 72
+        length = 70
+
+
+
     counter = PixelCounter(imgPath, width, length)    
-    counter.count()
-    # counter.writeCounts()
+    # counter.count()
+    counter.sampleColors()
+    print("test")
 
 
 if __name__ == "__main__":
     main()
+
+
+
