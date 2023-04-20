@@ -3,7 +3,7 @@ import os
 import re
 
 class PixelCounter:
-    def __init__(self, imgPath, saveFilePath,width, length, threshold) -> None:
+    def __init__(self, imgPath, saveFilePath,width, length, threshold, ignoredValues) -> None:
         self.img = Image.open(imgPath)
         self.img = self.img.convert("RGB")
         self.borderColor = self.img.getpixel((0, 0))
@@ -12,6 +12,7 @@ class PixelCounter:
         self.drawThreshold = threshold
         self.filename = re.search("[^/]+$", imgPath).group().split(".")
         self.saveFilePath = saveFilePath
+        self.topIgnored, self.bottomIgnored, self.leftIgnored, self.rightIgnored = ignoredValues
 
         # These variables help with choosing a font size
         self.width = width
@@ -56,12 +57,24 @@ class PixelCounter:
         self.rows = sorted(self.rows)
         self.columns = sorted(self.columns)
 
+        # remove columns based on ignored numbers
+        for x in range(self.topIgnored):
+            self.columns.pop(0)
+        for x in range(self.bottomIgnored):
+            # self.columns.pop(len(self.columns) - 1)
+            self.columns.pop()
+        for x in range(self.leftIgnored):
+            self.rows.pop(0)
+        for x in range(self.rightIgnored):
+            # self.rows.pop(len(self.rows) - 1)
+            self.rows.pop()
+
     def count(self):
         img_editable = ImageDraw.Draw(self.img)
 
         # step through each row
         # counting and drawing the adjacent colors in each row
-        for y in range(len(self.columns) - 1):
+        for y in range(0, len(self.columns) - 1):
             rowCounts = []
             rgbPrev = self.img.getpixel((self.rows[0] + 1, self.columns[y] + 1))
             drawX = 0

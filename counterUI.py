@@ -30,6 +30,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def countSquares(self):
         self.pushButton.setEnabled(False)
 
+        # check if ignored number of rows/columns are numbers
+        if not self.topRowsLineEdit.text().isdigit():
+            self.topRowsLineEdit.setText("0")
+        if not self.bottomRowsLineEdit.text().isdigit():
+            self.bottomRowsLineEdit.setText("0")
+        if not self.rightColumnsLineEdit.text().isdigit():
+            self.rightColumnsLineEdit.setText("0")
+        if not self.leftColumnsLineEdit.text().isdigit():
+            self.leftColumnsLineEdit.setText("0") 
+
+        # set current image file path
         if self.fileBox.currentIndex() == 0:
             imgPath = self.customPath.text()
 
@@ -61,7 +72,15 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # try to create a counter object
         try:
-            counter = PixelCounter(imgPath, countedPath,int(width), int(length), int(threshold))
+            counter = PixelCounter(imgPath, 
+                                   countedPath,
+                                   int(width), 
+                                   int(length), 
+                                   int(threshold), 
+                                   (int(self.topRowsLineEdit.text()),
+                                        int(self.bottomRowsLineEdit.text()),
+                                        int(self.leftColumnsLineEdit.text()),
+                                        int(self.rightColumnsLineEdit.text())))
         except ValueError:
             self.warning("Invalid Value","Either the 'Width', 'Length', or 'Count Threshold' fields contain data that isn't a number")
             self.pushButton.setEnabled(True)
