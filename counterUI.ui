@@ -171,6 +171,12 @@
         </item>
         <item row="1" column="1">
          <widget class="QLineEdit" name="topRowsLineEdit">
+          <property name="toolTip">
+           <string>ignore number of rows</string>
+          </property>
+          <property name="statusTip">
+           <string>Specify the amount of rows to ignore on the top</string>
+          </property>
           <property name="text">
            <string>0</string>
           </property>
@@ -185,6 +191,12 @@
         </item>
         <item row="2" column="1">
          <widget class="QLineEdit" name="bottomRowsLineEdit">
+          <property name="toolTip">
+           <string>ignore number of rows</string>
+          </property>
+          <property name="statusTip">
+           <string>Specify the amount of rows to ignore on the bottom</string>
+          </property>
           <property name="text">
            <string>0</string>
           </property>
@@ -199,6 +211,12 @@
         </item>
         <item row="3" column="1">
          <widget class="QLineEdit" name="rightColumnsLineEdit">
+          <property name="toolTip">
+           <string>ignore number of columns</string>
+          </property>
+          <property name="statusTip">
+           <string>Specify the amount of columns to ignore on right side</string>
+          </property>
           <property name="text">
            <string>0</string>
           </property>
@@ -213,6 +231,12 @@
         </item>
         <item row="4" column="1">
          <widget class="QLineEdit" name="leftColumnsLineEdit">
+          <property name="toolTip">
+           <string>ignore number of rows</string>
+          </property>
+          <property name="statusTip">
+           <string>Specify the amount of columns to ignore on left side</string>
+          </property>
           <property name="text">
            <string>0</string>
           </property>
