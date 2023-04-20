@@ -2,6 +2,8 @@ import sys, os
 from pathlib import Path
 from PyQt6 import QtWidgets, uic
 from PatternCounter import PixelCounter
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 imagesPath = "./images/"
 countedPath = "./counted/"
@@ -13,6 +15,19 @@ if not os.path.exists(imagesPath):
     os.mkdir(imagesPath)
 
 class MainWindow(QtWidgets.QMainWindow):
+    class Event(FileSystemEventHandler):
+        def __init__(self, fileBox):
+            super().__init__()
+            self.fileBox = fileBox
+
+        def on_created(self, event):
+            file = event.src_path.split("/")[-1]
+            self.fileBox.addItem(file)
+        
+        def on_deleted(self, event):
+            file = event.src_path.split("/")[-1]
+            self.fileBox.removeItem(self.fileBox.findText(file))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi(self.fetch_resource("counterUI.ui") , self)
@@ -22,10 +37,15 @@ class MainWindow(QtWidgets.QMainWindow):
         for file in files:
             self.fileBox.addItem(file)
 
-        # connect button with clicked signal
+        # connecting signals
         self.pushButton.clicked.connect(self.countSquares)
-
         self.fileBox.currentIndexChanged.connect(self.indexChanged)
+
+        # initiating watchdog thread to update file combo box
+        self.event_handler = MainWindow.Event(self.fileBox)
+        self.observer = Observer()
+        self.observer.schedule(self.event_handler, imagesPath, recursive=False)
+        self.observer.start()
 
     def countSquares(self):
         self.pushButton.setEnabled(False)
@@ -110,6 +130,13 @@ class MainWindow(QtWidgets.QMainWindow):
             return resource_path
         else:  # return temp resource path
             return base_path.joinpath(resource_path)
+        
+    def closeEvent(self, event) -> None:
+        # closing observer thread
+        self.observer.stop()
+        self.observer.join()
+
+        return super().closeEvent(event)
 
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()
