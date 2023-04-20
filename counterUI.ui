@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>289</height>
+    <width>537</width>
+    <height>436</height>
    </rect>
   </property>
   <property name="font">
@@ -26,8 +26,11 @@
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
+       <enum>QLayout::SetMinimumSize</enum>
       </property>
       <property name="leftMargin">
        <number>5</number>
@@ -155,6 +158,63 @@
        </layout>
       </item>
       <item>
+       <layout class="QFormLayout" name="formLayout_2">
+        <property name="labelAlignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <item row="1" column="0">
+         <widget class="QLabel" name="topRowsLabel">
+          <property name="text">
+           <string>Top Rows:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="topRowsLineEdit"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="bottomRowsLabel">
+          <property name="text">
+           <string>Bottom Rows:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="bottomRowsLineEdit"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="rightColumnsLabel">
+          <property name="text">
+           <string>Right Columns:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="rightColumnsLineEdit"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="leftColumnsLabel">
+          <property name="text">
+           <string>Left Columns:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="leftColumnsLineEdit"/>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Ignored Number Of Columns/Rows:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QPushButton" name="pushButton">
         <property name="toolTip">
          <string>start counting</string>
@@ -176,7 +236,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>453</width>
+     <width>537</width>
      <height>29</height>
     </rect>
    </property>
