@@ -4,6 +4,7 @@
 *.jpg
 *.spec
 *.cmd
+*.autosove
 
 build
 dist
